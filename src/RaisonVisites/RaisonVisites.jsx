@@ -24,9 +24,8 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLocation, useNavigate } from "react-router-dom";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
-const Visites = () => {
+const RaisonVisites = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
@@ -39,10 +38,10 @@ const Visites = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [visiteToDelete, setVisiteToDelete] = useState(null);
+  const [raisonToDelete, setRaisonToDelete] = useState(null);
 
-  const handleDeleteDialogOpen = (visite) => {
-    setVisiteToDelete(visite);
+  const handleDeleteDialogOpen = (raison) => {
+    setRaisonToDelete(raison);
     setOpenDeleteDialog(true);
   };
 
@@ -50,21 +49,24 @@ const Visites = () => {
     setOpenDeleteDialog(false);
   };
 
-  const handleDeleteVisite = async () => {
-    if (visiteToDelete) {
+  const handleDeleteRaison = async () => {
+    if (raisonToDelete) {
       try {
         await axios.delete(
-          `http://localhost:5000/api/Visites/${visiteToDelete.uid}`
+          `http://localhost:5000/api/RaisonVisites/${raisonToDelete.id}`
         );
         const newData = data.filter(
-          (visite) => visite.uid !== visiteToDelete.uid
+          (raison) => raison.id !== raisonToDelete.id
         );
         setData(newData);
-        setSnackbarMessage("Visite supprimée avec succès");
+        setSnackbarMessage("Raison de visite supprimée avec succès");
         setOpenSnackbar(true);
         setTimeout(() => setOpenSnackbar(false), 3000);
       } catch (error) {
-        console.error("Erreur lors de la suppression de la visite", error);
+        console.error(
+          "Erreur lors de la suppression de la raison de visite",
+          error
+        );
         setSnackbarMessage("Erreur lors de la suppression");
         setOpenSnackbar(true);
         setTimeout(() => setOpenSnackbar(false), 3000);
@@ -75,10 +77,22 @@ const Visites = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/Visites");
-      setData(response.data.data.$values);
+      const response = await axios.get(
+        "http://localhost:5000/api/RaisonVisites"
+      );
+      // Vérifiez si la réponse contient la propriété $values et c'est un tableau
+      if (response.data && Array.isArray(response.data.$values)) {
+        setData(response.data.$values);
+      } else {
+        console.error(
+          "Data received is not in expected format:",
+          response.data
+        );
+        setData([]); // Mettez à jour avec un tableau vide si les données ne sont pas au format attendu
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
+      setData([]); // Mettez à jour avec un tableau vide en cas d'erreur
     } finally {
       setLoading(false);
     }
@@ -98,8 +112,8 @@ const Visites = () => {
     fetchData();
   }, [location, navigate]);
 
-  const handleClick = (event, visite) => {
-    setSelected(visite.uid === selected ? null : visite.uid);
+  const handleClick = (event, raison) => {
+    setSelected(raison.id === selected ? null : raison.id);
   };
 
   const handleEmptyClick = (event) => {
@@ -115,10 +129,6 @@ const Visites = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleMoreDetails = (event) => {
-    console.log(event.target.value);
   };
 
   const cellStyle = {
@@ -145,14 +155,14 @@ const Visites = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Êtes-vous sûr de vouloir supprimer cette visite ?
+            Êtes-vous sûr de vouloir supprimer cette raison de visite ?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteDialogClose} color="primary">
             Annuler
           </Button>
-          <Button onClick={handleDeleteVisite} color="primary" autoFocus>
+          <Button onClick={handleDeleteRaison} color="primary" autoFocus>
             Confirmer
           </Button>
         </DialogActions>
@@ -182,13 +192,13 @@ const Visites = () => {
         </div>
       ) : (
         <>
-          <Link to="/visites/add" style={{ textDecoration: "none" }}>
+          <Link to="/raisonvisites/add" style={{ textDecoration: "none" }}>
             <Button
               variant="contained"
               color="primary"
               style={{ marginBottom: "15px" }}
             >
-              Ajouter Visite
+              Ajouter raison
             </Button>
           </Link>
           <TableContainer
@@ -202,78 +212,27 @@ const Visites = () => {
                 style={{ backgroundColor: "rgba(204, 204, 204, 0.15)" }}
               >
                 <TableRow>
-                  <TableCell style={cellStyle}>Date Heure Début</TableCell>
-                  <TableCell style={cellStyle}>Date Heure Fin</TableCell>
-                  <TableCell style={cellStyle}>Personnel</TableCell>
-
-                  <TableCell style={cellStyle}>Raison Visite</TableCell>
-                  <TableCell style={cellStyle}>Statut</TableCell>
-                  <TableCell style={cellStyle}>Type Visite</TableCell>
+                  <TableCell style={cellStyle}>Nom</TableCell>
                   <TableCell style={cellStyle}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {data
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((visite) => {
-                    const isSelected = selected === visite.uid;
+                  .map((raison) => {
+                    const isSelected = selected === raison.id;
                     return (
                       <TableRow
-                        key={visite.uid}
+                        key={raison.id}
                         hover
-                        onClick={(event) => handleClick(event, visite)}
+                        onClick={(event) => handleClick(event, raison)}
                         selected={isSelected}
                       >
-                        <TableCell>{visite.dateHeureDebut}</TableCell>
-                        <TableCell>{visite.dateHeureFin}</TableCell>
-                        <TableCell>
-                          {visite.personnelNom + " " + visite.personnelPrenom}
-                        </TableCell>
-
-                        <TableCell>{visite.raisonVisiteNom}</TableCell>
-                        <TableCell>
-                          <span
-                            style={{
-                              backgroundColor:
-                                visite.statutNom === "En cours"
-                                  ? "purple"
-                                  : visite.statutNom === "Clôturée"
-                                  ? "#4caf50"
-                                  : visite.statutNom === "Annulée"
-                                  ? "#f44336"
-                                  : null,
-                              color: "white", // Couleur du texte
-                              padding: "5px 5px", // Marge intérieure pour améliorer l'apparence
-                              borderRadius: "5px", // Bordure arrondie pour un meilleur aspect
-                              display: "inline-block", // Affichage en ligne pour l'élément span
-                            }}
-                          >
-                            {visite.statutNom}
-                          </span>
-                        </TableCell>
-
-                        <TableCell>
-                          <span
-                            style={{
-                              backgroundColor:
-                                visite.typeVisiteNom === "Prévue"
-                                  ? "#2196f3"
-                                  : visite.typeVisiteNom === "Non-Prévue"
-                                  ? "#e91e63"
-                                  : null,
-                              color: "white", // Couleur du texte
-                              padding: "5px 5px", // Marge intérieure pour améliorer l'apparence
-                              borderRadius: "5px", // Bordure arrondie pour un meilleur aspect
-                              display: "inline-block", // Affichage en ligne pour l'élément span
-                            }}
-                          >
-                            {visite.typeVisiteNom}
-                          </span>
-                        </TableCell>
+                        <TableCell>{raison.nom}</TableCell>
 
                         <TableCell>
                           <Tooltip title="Edit">
-                            <Link to={`/visites/edit/${visite.uid}`}>
+                            <Link to={`/raisonvisites/edit/${raison.id}`}>
                               <IconButton
                                 aria-label="edit"
                                 style={{ color: "#3f51b5" }}
@@ -282,14 +241,13 @@ const Visites = () => {
                               </IconButton>
                             </Link>
                           </Tooltip>
-
-                          <Tooltip title="More Details">
+                          <Tooltip title="Delete">
                             <IconButton
-                              aria-label="moreDetails"
-                              style={{ color: "grey" }}
-                              onClick={() => handleMoreDetails(visite)}
+                              aria-label="delete"
+                              style={{ color: "#f44336" }}
+                              onClick={() => handleDeleteDialogOpen(raison)}
                             >
-                              <VisibilityIcon />
+                              <DeleteIcon />
                             </IconButton>
                           </Tooltip>
                         </TableCell>
@@ -315,4 +273,4 @@ const Visites = () => {
   );
 };
 
-export default Visites;
+export default RaisonVisites;
