@@ -23,6 +23,8 @@ import RaisonVisites from "./RaisonVisites/RaisonVisites";
 import AjoutRaisonVisites from "./RaisonVisites/AjoutRaisonVisites/AjoutRaisonVisites";
 import EditRaisonVisites from "./RaisonVisites/EditRaisonVisites/EditRaisonVisites";
 import AjoutVisites from "./Visites/AjoutVisites/AjoutVisites";
+import SingleVisite from "./Visites/SingleVisite/SingleVisite";
+import EditVisite from "./Visites/EditVisite/EditVisite";
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="visites" element={<Visites />} />
             <Route path="/visites/add" element={<AjoutVisites />} />
+            <Route path="/visites/edit/:id" element={<EditVisite />} />
+            <Route path="/visites/show/:id" element={<SingleVisite />} />
             <Route path="/raisonvisites" element={<RaisonVisites />} />
             <Route path="/raisonvisites/add" element={<AjoutRaisonVisites />} />
             <Route

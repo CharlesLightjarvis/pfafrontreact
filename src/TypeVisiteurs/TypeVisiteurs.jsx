@@ -163,7 +163,12 @@ const TypeVisiteurs = () => {
           <Button onClick={handleDeleteDialogClose} color="primary">
             Annuler
           </Button>
-          <Button onClick={handleDeleteTypeVisiteur} color="primary" autoFocus>
+          <Button
+            onClick={handleDeleteTypeVisiteur}
+            color="primary"
+            variant="contained"
+            autoFocus
+          >
             Confirmer
           </Button>
         </DialogActions>
@@ -199,7 +204,7 @@ const TypeVisiteurs = () => {
               color="primary"
               style={{ marginBottom: "15px" }}
             >
-              Ajouter type
+              Ajouter
             </Button>
           </Link>
           <TableContainer

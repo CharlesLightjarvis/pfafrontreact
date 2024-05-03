@@ -188,7 +188,7 @@ const Visites = () => {
               color="primary"
               style={{ marginBottom: "15px" }}
             >
-              Ajouter Visite
+              Ajouter
             </Button>
           </Link>
           <TableContainer
@@ -283,14 +283,15 @@ const Visites = () => {
                             </Link>
                           </Tooltip>
 
-                          <Tooltip title="More Details">
-                            <IconButton
-                              aria-label="moreDetails"
-                              style={{ color: "grey" }}
-                              onClick={() => handleMoreDetails(visite)}
-                            >
-                              <VisibilityIcon />
-                            </IconButton>
+                          <Tooltip title="Details">
+                            <Link to={`/visites/show/${visite.uid}`}>
+                              <IconButton
+                                aria-label="moreDetails"
+                                style={{ color: "grey" }}
+                              >
+                                <VisibilityIcon />
+                              </IconButton>
+                            </Link>
                           </Tooltip>
                         </TableCell>
                       </TableRow>

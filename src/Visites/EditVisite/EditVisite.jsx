@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
-  TextField,
   Button,
+  TextField,
   Typography,
   Grid,
   Paper,
@@ -13,16 +14,14 @@ import {
 } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import axios from "axios";
 
-const AjoutVisites = () => {
-  const navigate = useNavigate();
+const EditVisite = () => {
   const [visite, setVisite] = useState({
     dateHeureDebut: new Date(),
     dateHeureFin: new Date(),
     raisonVisiteId: "",
     typeVisiteId: "",
-    statutId: "", // Laisser vide pour que le useEffect le définisse
+    statutId: "",
     personnelId: "",
     visiteurId: "",
     details: "",
@@ -37,11 +36,16 @@ const AjoutVisites = () => {
   const [statuts, setStatuts] = useState([]);
   const [typeVisites, setTypeVisites] = useState([]);
   const [typeVisiteurs, setTypeVisiteurs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-  // Effect hook to fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const visiteRes = await axios.get(
+          `http://localhost:5000/api/Visites/${id}`
+        );
         const personnelRes = await axios.get(
           "http://localhost:5000/api/Personnel"
         );
@@ -55,43 +59,39 @@ const AjoutVisites = () => {
         const typeVisiteursRes = await axios.get(
           "http://localhost:5000/api/TypeVisiteurs"
         );
+        console.log(visiteRes);
+        console.log(personnelRes);
+        console.log(raisonsRes);
+        console.log(statutsRes);
+        console.log(typeVisitesRes);
+        console.log(typeVisiteursRes);
 
-        // Trie des statuts par nom
-        const sortedStatuts = statutsRes.data.sort((a, b) =>
-          a.nom.localeCompare(b.nom)
-        );
-
-        // Trouve l'ID du statut "En cours"
-        const enCoursStatutId = sortedStatuts.find(
-          (statut) => statut.nom === "En cours"
-        ).id;
-
+        setVisite({
+          ...visiteRes.data,
+          dateHeureDebut: new Date(visiteRes.data.data.dateHeureDebut),
+          dateHeureFin: new Date(visiteRes.data.data.dateHeureFin),
+        });
         setPersonnel(personnelRes.data.$values);
         setRaisonsVisites(raisonsRes.data.$values);
-        setStatuts(sortedStatuts);
+        setStatuts(statutsRes.data);
         setTypeVisites(typeVisitesRes.data.$values);
         setTypeVisiteurs(typeVisiteursRes.data.$values);
-
-        // Définit l'ID du statut "En cours" comme valeur par défaut
-        setVisite((prevState) => ({
-          ...prevState,
-          statutId: enCoursStatutId,
-        }));
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(visite);
     try {
-      await axios.post(`http://localhost:5000/api/Visites`, visite);
-      navigate(`/visites?toastMessage=Opération réussie`);
+      await axios.put(`http://localhost:5000/api/Visites/${id}`, visite);
+      navigate("/visites?toastMessage=Opération réussie");
     } catch (error) {
-      console.error("Error adding visite:", error);
+      console.error("Error updating visite:", error);
     }
   };
 
@@ -103,6 +103,23 @@ const AjoutVisites = () => {
   const handleDateChange = (date, fieldName) => {
     setVisite((prevState) => ({ ...prevState, [fieldName]: date }));
   };
+
+  if (loading) {
+    return (
+      <Paper
+        style={{
+          padding: "16px",
+          margin: "auto",
+          maxWidth: "600px",
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h6">Chargement...</Typography>
+        <DatePicker />
+      </Paper>
+    );
+  }
+
   return (
     <Paper style={{ padding: "16px", margin: "auto", maxWidth: "600px" }}>
       <Typography variant="h6" style={{ marginBottom: "20px" }}>
@@ -233,11 +250,7 @@ const AjoutVisites = () => {
           <Grid item xs={12}>
             <FormControl fullWidth>
               <InputLabel>Statut de la visite</InputLabel>
-              <Select
-                value={visite.statutId}
-                label="Statut de la visite"
-                disabled // Rend le champ non modifiable
-              >
+              <Select value={visite.statutId} label="Statut de la visite">
                 {statuts.map((statut) => (
                   <MenuItem key={statut.id} value={statut.id}>
                     {statut.nom}
@@ -275,4 +288,4 @@ const AjoutVisites = () => {
   );
 };
 
-export default AjoutVisites;
+export default EditVisite;

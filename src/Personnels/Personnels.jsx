@@ -158,7 +158,12 @@ const Personnels = () => {
           <Button onClick={handleDeleteDialogClose} color="primary">
             Annuler
           </Button>
-          <Button onClick={handleDeletePerson} color="primary" autoFocus>
+          <Button
+            onClick={handleDeletePerson}
+            color="primary"
+            variant="contained"
+            autoFocus
+          >
             Confirmer
           </Button>
         </DialogActions>
@@ -195,7 +200,7 @@ const Personnels = () => {
               color="primary"
               style={{ marginBottom: "15px" }}
             >
-              Ajout personnel
+              Ajouter
             </Button>
           </Link>
           <TableContainer

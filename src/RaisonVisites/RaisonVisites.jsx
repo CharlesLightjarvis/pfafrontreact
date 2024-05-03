@@ -162,7 +162,12 @@ const RaisonVisites = () => {
           <Button onClick={handleDeleteDialogClose} color="primary">
             Annuler
           </Button>
-          <Button onClick={handleDeleteRaison} color="primary" autoFocus>
+          <Button
+            onClick={handleDeleteRaison}
+            color="primary"
+            variant="contained"
+            autoFocus
+          >
             Confirmer
           </Button>
         </DialogActions>
@@ -198,7 +203,7 @@ const RaisonVisites = () => {
               color="primary"
               style={{ marginBottom: "15px" }}
             >
-              Ajouter raison
+              Ajouter
             </Button>
           </Link>
           <TableContainer

@@ -24,7 +24,7 @@ import Badge from "@mui/material/Badge"; // Ensure Badge is imported
 import Visites from "./Visites/Visites";
 import { Link, Outlet } from "react-router-dom";
 import Dashboard from "./Dashboard/Dashboard";
-import logo from "./Outlook-ei1pcqrf.png";
+import logo from "./logo.png";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
@@ -195,8 +195,8 @@ export default function MiniDrawer() {
             style={{
               width: "100%",
               height: "auto",
-              maxHeight: "100px",
-              objectFit: "contain",
+              maxHeight: "50px",
+              objectFit: "cover",
             }}
           />
           <IconButton onClick={handleDrawerClose}>
